@@ -12,13 +12,13 @@ public class ThinNode extends BaseNode {
 		String[] merkle_path = this.fullNode.getMerklePath(tx.getTxid());
 		String accum_hash = this.getTransactionHash(tx);
 		
-		for (String hash : merkle_path) {
-			if (hash.charAt(0) == 'L') {
-				System.out.println(hash.substring(1, hash.length()));
-				accum_hash = this.getHash(hash.substring(1, hash.length()) + accum_hash);
-			} else if (hash.charAt(0) == 'R') {
-				System.out.println(hash.substring(1, hash.length()));
-				accum_hash = this.getHash(accum_hash + hash.substring(1, hash.length()));
+		for (String hash_op : merkle_path) {
+			char op = hash_op.charAt(0);
+			String hash = hash_op.substring(1, hash_op.length());
+			if (op == 'L') {
+				accum_hash = this.getHash(hash + accum_hash);
+			} else if (op == 'R') {
+				accum_hash = this.getHash(accum_hash + hash);
 			}
 		}
 		
