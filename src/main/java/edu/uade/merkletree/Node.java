@@ -29,14 +29,14 @@ public class Node extends BaseNode {
 	private Pair<String, String> buildMerkleRoot(List<Transaction> txs) {
 		if (txs.size() == 0) {
 			return Pair.with("", "");
-		}else if (txs.size() == 1) {
+		} else if (txs.size() == 1) {
 			String left_hash = this.getTransactionHash(txs.get(0));
 			return Pair.with(left_hash, left_hash);
-		}else if (txs.size() == 2) {
+		} else if (txs.size() == 2) {
 			String left_hash = this.getTransactionHash(txs.get(0));
 			String right_hash = this.getTransactionHash(txs.get(1));
 			return Pair.with(left_hash, right_hash);
-		}else {
+		} else {
 			int half_pointer = (int) txs.size() / 2;
 			Pair<String, String> left_hashes = this.buildMerkleRoot(txs.subList(0, half_pointer));
 			Pair<String, String> right_hashes = this.buildMerkleRoot(txs.subList(half_pointer, txs.size()));
@@ -61,7 +61,7 @@ public class Node extends BaseNode {
 			String root_hash = this.getHash(left_hash + left_hash);
 			if (txs.get(0).getTxid() == txid) {
 				result = Triplet.with(root_hash, true, new String[]{"L" + left_hash});
-			}else {
+			} else {
 				result = Triplet.with(root_hash, false, new String[]{});
 			}
 		}else if (txs.size() == 2) {
@@ -70,9 +70,9 @@ public class Node extends BaseNode {
 			String root_hash = this.getHash(left_hash + right_hash);
 			if (txs.get(0).getTxid() == txid) {
 				result = Triplet.with(root_hash, true, new String[]{"R" + right_hash});
-			}else if (txs.get(1).getTxid() == txid) {
+			} else if (txs.get(1).getTxid() == txid) {
 				result = Triplet.with(root_hash, true, new String[]{"L" + left_hash});
-			}else {
+			} else {
 				result = Triplet.with(root_hash, false, new String[]{});
 			}
 		}else {
