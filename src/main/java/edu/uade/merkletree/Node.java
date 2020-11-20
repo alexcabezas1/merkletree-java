@@ -48,50 +48,50 @@ public class Node extends BaseNode {
 	}
 
 	public String[] getMerklePath(String txid) {
-		Triplet<String, Boolean, String[]> result = this.getMerklePath(txid, this.transactions);
-		return result.getValue2();
+		Pair<String, String[]> result = this.getMerklePath(txid, this.transactions);
+		return result.getValue1();
 	} 
 	
-	private Triplet<String, Boolean, String[]> getMerklePath(String txid, List<Transaction> txs) {
-		Triplet<String, Boolean, String[]> result;
+	private Pair<String, String[]> getMerklePath(String txid, List<Transaction> txs) {
+		Pair<String, String[]> result;
 		if (txs.size() == 0) {
-			result = Triplet.with("", false, new String[]{});
+			result = Pair.with("", new String[]{});
 		}else if (txs.size() == 1) {
 			String left_hash = this.getTransactionHash(txs.get(0));
 			String root_hash = this.getHash(left_hash + left_hash);
 			if (txs.get(0).getTxid() == txid) {
-				result = Triplet.with(root_hash, true, new String[]{"L" + left_hash});
+				result = Pair.with(root_hash, new String[]{"L" + left_hash});
 			} else {
-				result = Triplet.with(root_hash, false, new String[]{});
+				result = Pair.with(root_hash, new String[]{});
 			}
 		}else if (txs.size() == 2) {
 			String left_hash = this.getTransactionHash(txs.get(0));
 			String right_hash = this.getTransactionHash(txs.get(1));
 			String root_hash = this.getHash(left_hash + right_hash);
 			if (txs.get(0).getTxid() == txid) {
-				result = Triplet.with(root_hash, true, new String[]{"R" + right_hash});
+				result = Pair.with(root_hash, new String[]{"R" + right_hash});
 			} else if (txs.get(1).getTxid() == txid) {
-				result = Triplet.with(root_hash, true, new String[]{"L" + left_hash});
+				result = Pair.with(root_hash, new String[]{"L" + left_hash});
 			} else {
-				result = Triplet.with(root_hash, false, new String[]{});
+				result = Pair.with(root_hash, new String[]{});
 			}
 		}else {
 			int half_pointer = (int) txs.size() / 2;
-			Triplet<String, Boolean, String[]> left_result = this.getMerklePath(txid, txs.subList(0, half_pointer));
-			Triplet<String, Boolean, String[]> right_result = this.getMerklePath(txid, txs.subList(half_pointer, txs.size()));
+			Pair<String, String[]> left_result = this.getMerklePath(txid, txs.subList(0, half_pointer));
+			Pair<String, String[]> right_result = this.getMerklePath(txid, txs.subList(half_pointer, txs.size()));
 			String root_hash = this.getHash(left_result.getValue0() + right_result.getValue0());
 			
-			if (left_result.getValue1()) {
-				String[] left_path = this.addElement(left_result.getValue2(), "R" + right_result.getValue0());
-				result = Triplet.with(root_hash, true, left_path);
+			if (left_result.getValue1().length > 0) {
+				String[] left_path = this.addElement(left_result.getValue1(), "R" + right_result.getValue0());
+				result = Pair.with(root_hash, left_path);
 				return result;
-			} else if (right_result.getValue1()) {
-				String[] right_path = this.addElement(right_result.getValue2(), "L" + left_result.getValue0());
-				result = Triplet.with(root_hash, true, right_path);
+			} else if (right_result.getValue1().length > 0) {
+				String[] right_path = this.addElement(right_result.getValue1(), "L" + left_result.getValue0());
+				result = Pair.with(root_hash, right_path);
 				return result;
 			}
 			
-			result = Triplet.with(root_hash, false, new String[]{});
+			result = Pair.with(root_hash, new String[]{});
 		}
 		return result;
 	}
